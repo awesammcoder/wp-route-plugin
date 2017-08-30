@@ -29,7 +29,14 @@
             }
 
             function route_rewrite() {
-                add_rewrite_rule( '([^/]+)', 'index.php?route=$matches[1]', 'top');
+                $current_url = str_replace('http://', '', strtolower(get_site_url()));
+                $current_url = str_replace('https://', '', strtolower($current_url));
+                $current_uri = str_replace($current_url, '', strtolower($_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']));
+                flush_rewrite_rules();
+
+                if( !(get_page_by_path( substr($current_uri, 1)) OR url_to_postid(get_site_url() . $current_uri))){
+                    add_rewrite_rule( '([^/]+)', 'index.php?route=$matches[1]', 'top');
+                }
             }
              
             function route_queryvars($vars){
@@ -53,6 +60,7 @@
             
             function route_config(){
                 $route = apply_filters('wp_route_config', array());
+                $route['test'] = plugin_dir_path(__FILE__) . 'test.php';
                 return $route;
             }
         }
